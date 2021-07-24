@@ -7,6 +7,8 @@ use todo_cli::log::{process_arguments, Action};
 use todo_cli::data;
 use std::io::Read;
 use todo_cli::data::{DataPersisted, Task};
+
+
 mod io;
 
 
@@ -41,13 +43,15 @@ fn main() -> Result<(), String> {
    let action = log::process_arguments(&matches)?;
 
     let mut bar = deserialized.unwrap_or_else(|| DataPersisted::empty());
+    let mut what_to_print = String::new();
     match action {
         Action::Add(r) =>
             bar.add_active(Task::new(1, r.task_name, None)),
         Action::Complete(y) => (),
-        Action::List => (),
+        Action::List => what_to_print.push_str(bar.print_tty().as_str())
     };
 
     let qux = serde_json::to_string_pretty(&bar).map_err(|x| x.to_string())?;
+    std::io::stdout().write(what_to_print.as_bytes());
     io::persist_user_state(format!("{}{}", qux.as_str(), "\n").as_str())
 }

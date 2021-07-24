@@ -51,4 +51,21 @@ impl<'a> DataPersisted<'a> {
     pub fn add_active<'b: 'a>(&mut self, task: Task<'b>) -> () {
         self.active.append(&mut vec![task])
     }
+
+    pub fn print_tty(&self) -> String {
+        let mut res = String::new();
+        res.push_str("\u{001b}[1;31mActive\u{001b}[0m \u{23F3}\n");
+        for i in &self.active {
+            res.push_str(format!("{}{}", i.description, "\n").as_str());
+        }
+        res.push_str("\n");
+        res.push_str("\n");
+
+        res.push_str("\u{001b}[1;31mCompleted\u{001b}[0m \u{2705}\n");
+        for i in &self.completed {
+            res.push_str(format!("{}{}", i.description, "\n").as_str());
+        }
+
+        res
+    }
 }
