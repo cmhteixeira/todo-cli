@@ -74,6 +74,24 @@ impl<'a> DataPersisted<'a> {
         }
     }
 
+    pub fn delete_task(&mut self, task_id: u32) -> () {
+        let active = self.active.iter().position(|elem| elem.id == task_id);
+        match active {
+            None => (), // do nothing
+            Some(task_index) => {
+                self.active.remove(task_index);
+            }
+        }
+
+        let completed = self.completed.iter().position(|elem| elem.id == task_id);
+        match completed {
+            None => (), // do nothing
+            Some(task_index) => {
+                self.completed.remove(task_index);
+            }
+        }
+    }
+
     pub fn print_tty(&self) -> String {
         let mut res = String::new();
         res.push_str("\u{001b}[1;31mActive\u{001b}[0m \u{23F3}\n");
