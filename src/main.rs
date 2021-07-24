@@ -46,7 +46,7 @@ fn main() -> Result<(), String> {
     let mut what_to_print = String::new();
     match action {
         Action::Add(r) =>
-            bar.add_active(Task::new(1, r.task_name, None)),
+            bar.add_active(r.task_name, None),
         Action::Complete(y) => (),
         Action::List => what_to_print.push_str(bar.print_tty().as_str())
     };

@@ -37,33 +37,46 @@ pub struct DataPersisted<'b> {
     #[serde(borrow)]
     active: Vec<Task<'b>>,
     #[serde(borrow)]
-    completed: Vec<Task<'b>>
+    completed: Vec<Task<'b>>,
 }
 
 impl<'a> DataPersisted<'a> {
     pub fn empty() -> DataPersisted<'static> {
         DataPersisted {
             active: vec![],
-            completed: vec![]
+            completed: vec![],
         }
     }
 
-    pub fn add_active<'b: 'a>(&mut self, task: Task<'b>) -> () {
-        self.active.append(&mut vec![task])
+    pub fn add_active<'b: 'a>(&mut self, description: &'b str, importance: Option<Importance>) -> () {
+        let mut next_id = 1;
+        for i in 1..u32::MAX {
+            if self.active.iter().any(|task| task.id == i) {
+                continue;
+            } else if self.completed.iter().any(|task| task.id == i) {
+                continue;
+            } else {
+                next_id = i;
+                break;
+            }
+        }
+        self.active.append(&mut vec![Task::new(next_id as u32, description, importance)])
     }
 
     pub fn print_tty(&self) -> String {
         let mut res = String::new();
         res.push_str("\u{001b}[1;31mActive\u{001b}[0m \u{23F3}\n");
+        let greatest_size = self.active.iter().map(|task|task.description.len()).max();
         for i in &self.active {
-            res.push_str(format!("{}{}", i.description, "\n").as_str());
+            res.push_str(format!("{:width$}{}{}", i.description, i.id, "\n", width = greatest_size.unwrap() + 3).as_str());
         }
         res.push_str("\n");
         res.push_str("\n");
 
         res.push_str("\u{001b}[1;31mCompleted\u{001b}[0m \u{2705}\n");
+        let greatest_size = self.completed.iter().map(|task|task.description.len()).max();
         for i in &self.completed {
-            res.push_str(format!("{}{}", i.description, "\n").as_str());
+            res.push_str(format!("{:width$}{}{}", i.description, i.id, "\n", width = greatest_size.unwrap() + 3).as_str());
         }
 
         res
