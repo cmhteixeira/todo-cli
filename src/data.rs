@@ -63,6 +63,17 @@ impl<'a> DataPersisted<'a> {
         self.active.append(&mut vec![Task::new(next_id as u32, description, importance)])
     }
 
+    pub fn mark_completed(&mut self, task_id: u32) -> () {
+        let active = self.active.iter().position(|elem| elem.id == task_id);
+        match active {
+            None => (), // do nothing
+            Some(task_index) => {
+                let removed_task = self.active.remove(task_index);
+                self.completed.append(&mut vec![removed_task]);
+            }
+        }
+    }
+
     pub fn print_tty(&self) -> String {
         let mut res = String::new();
         res.push_str("\u{001b}[1;31mActive\u{001b}[0m \u{23F3}\n");

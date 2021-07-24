@@ -47,7 +47,7 @@ fn main() -> Result<(), String> {
     match action {
         Action::Add(r) =>
             bar.add_active(r.task_name, None),
-        Action::Complete(y) => (),
+        Action::Complete(task) => bar.mark_completed(task.task_id as u32),
         Action::List => what_to_print.push_str(bar.print_tty().as_str())
     };
 

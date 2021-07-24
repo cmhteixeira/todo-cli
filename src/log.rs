@@ -14,7 +14,7 @@ impl<'a> AddTask<'a> {
 }
 
 pub struct CompleteTask {
-    task_id: u8
+    pub task_id: u8
 }
 
 impl CompleteTask {
