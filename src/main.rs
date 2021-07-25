@@ -35,7 +35,10 @@ fn main() -> Result<(), String> {
             .short("d")
             .long("delete")
             .help("Delete a task/item. Works on both 'active' and 'completed' tasks.")
-            .takes_value(true))
+            .takes_value(true)
+            .multiple(true)
+            .use_delimiter(true)
+        )
         .get_matches();
 
     let persisted = io::read_user_state()?;
@@ -54,7 +57,7 @@ fn main() -> Result<(), String> {
             bar.add_active(r.task_name, None),
         Action::Complete(task) => bar.mark_completed(task.task_id as u32),
         Action::List => what_to_print.push_str(bar.print_tty().as_str()),
-        Action::Delete(log::DeleteTask{task_id}) => bar.delete_task(task_id as u32),
+        Action::Delete(log::DeleteTasks {task_ids}) => bar.delete_tasks(task_ids),
     };
 
     let qux = serde_json::to_string_pretty(&bar).map_err(|x| x.to_string())?;

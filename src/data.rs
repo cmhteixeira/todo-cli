@@ -92,6 +92,12 @@ impl<'a> DataPersisted<'a> {
         }
     }
 
+    pub fn delete_tasks(&mut self, task_ids: Vec<u8>) -> () {
+        for id in task_ids {
+            self.delete_task(id as u32)
+        }
+    }
+
     pub fn print_tty(&self) -> String {
         let mut res = String::new();
         res.push_str("\u{001b}[1;31mActive\u{001b}[0m \u{23F3}\n");
