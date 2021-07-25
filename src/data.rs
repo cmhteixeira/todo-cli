@@ -74,6 +74,12 @@ impl<'a> DataPersisted<'a> {
         }
     }
 
+    pub fn complete_tasks(&mut self, task_ids: Vec<u8>) -> () {
+        for i in task_ids {
+            self.mark_completed(i as u32)
+        }
+    }
+
     pub fn delete_task(&mut self, task_id: u32) -> () {
         let active = self.active.iter().position(|elem| elem.id == task_id);
         match active {

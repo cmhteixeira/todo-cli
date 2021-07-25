@@ -30,7 +30,9 @@ fn main() -> Result<(), String> {
             .short("c")
             .long("complete")
             .help("Set a task as being done/completed.")
-            .takes_value(true))
+            .takes_value(true)
+            .multiple(true)
+            .use_delimiter(true))
         .arg(Arg::with_name("delete")
             .short("d")
             .long("delete")
@@ -55,7 +57,7 @@ fn main() -> Result<(), String> {
     match action {
         Action::Add(r) =>
             bar.add_active(r.task_name, None),
-        Action::Complete(task) => bar.mark_completed(task.task_id as u32),
+        Action::Complete(task) => bar.complete_tasks(task.task_ids),
         Action::List => what_to_print.push_str(bar.print_tty().as_str()),
         Action::Delete(log::DeleteTasks {task_ids}) => bar.delete_tasks(task_ids),
     };

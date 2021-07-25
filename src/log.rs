@@ -3,7 +3,7 @@ use crate::log::Action::Complete;
 use std::num::ParseIntError;
 
 pub struct AddTask<'a> {
-    pub task_name: &'a str
+    pub task_name: &'a str,
 }
 
 impl<'a> AddTask<'a> {
@@ -15,19 +15,25 @@ impl<'a> AddTask<'a> {
 }
 
 pub struct CompleteTask {
-    pub task_id: u8
+    pub task_ids: Vec<u8>,
 }
 
 impl CompleteTask {
     fn new(id: u8) -> CompleteTask {
         CompleteTask {
-            task_id: id
+            task_ids: vec![id]
+        }
+    }
+
+    fn new_many(ids: Vec<u8>) -> CompleteTask {
+        CompleteTask {
+            task_ids: ids
         }
     }
 }
 
 pub struct DeleteTasks {
-    pub task_ids: Vec<u8>
+    pub task_ids: Vec<u8>,
 }
 
 impl DeleteTasks {
@@ -54,8 +60,16 @@ pub enum Action<'k> {
 
 pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String> {
     let add = i.value_of("add");
-    let complete = i.value_of("complete");
+    let complete: Option<Result<Vec<u8>, String>> = i.values_of("complete")
+        .map(|values|
+            values.map(|del_id_maybe|
+                parse_id(del_id_maybe)
+                    .map_err(|error| format!("Error parsing value '{}'", del_id_maybe))
+            ).collect()
+        );
+
     let list = i.is_present("list");
+
     let delete: Option<Result<Vec<u8>, String>> =
         i.values_of("delete")
             .map(|values|
@@ -66,19 +80,16 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
             );
 
 
-   match (add, complete, delete, list) {
-       (None, None, None, true) => Ok(Action::List),
-       (None, Some(b), None, _) =>
-           b.parse::<u8>()
-               .map_err(|_| String::from("Not a valid id"))
-               .map(|id| Action::Complete(CompleteTask::new(id)))
-       ,
-       (None, None, Some(Ok(tasks_to_delete)), _) =>
-           Ok(Action::Delete(DeleteTasks::new_many(tasks_to_delete))),
-       (None, None, Some(Err(error)), _) => Err(error),
-       (Some(a), None, None, _) => Ok(Action::Add(AddTask::new(a))),
-       (_, _, _, _) => Err(String::from("Not supported yet!")),
-   }
+    match (add, complete, delete, list) {
+        (None, None, None, true) => Ok(Action::List),
+        (None, Some(Err(error)), None, _) => Err(error),
+        (None, Some(Ok(tasks_to_complete)), None, _) => Ok(Action::Complete(CompleteTask::new_many(tasks_to_complete))),
+        (None, None, Some(Ok(tasks_to_delete)), _) =>
+            Ok(Action::Delete(DeleteTasks::new_many(tasks_to_delete))),
+        (None, None, Some(Err(error)), _) => Err(error),
+        (Some(a), None, None, _) => Ok(Action::Add(AddTask::new(a))),
+        (_, _, _, _) => Err(String::from("Not supported yet!")),
+    }
 }
 
 fn parse_id(id: &str) -> Result<u8, ParseIntError> {
