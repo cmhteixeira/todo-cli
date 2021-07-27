@@ -22,6 +22,12 @@ fn main() -> Result<(), String> {
             .long("add")
             .help("Add a task/item to your todo list")
             .takes_value(true))
+        .arg(Arg::with_name("project")
+            .short("p")
+            .long("project")
+            .help("Specify a project this task should be added too.")
+            .takes_value(true)
+            .requires("add"))
         .arg(Arg::with_name("list")
             .short("l")
             .long("list")
@@ -56,7 +62,7 @@ fn main() -> Result<(), String> {
     let mut what_to_print = String::new();
     match action {
         Action::Add(r) =>
-            bar.add_active(r.task_name, None),
+            bar.add_active(r.task_name, r.project, None),
         Action::Complete(task) => bar.complete_tasks(task.task_ids),
         Action::List => what_to_print.push_str(bar.print_tty().as_str()),
         Action::Delete(log::DeleteTasks {task_ids}) => bar.delete_tasks(task_ids),

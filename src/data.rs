@@ -1,6 +1,7 @@
 use std::time::Instant;
 use serde::{Deserialize, Serialize};
 use serde_json::Result;
+use serde_json::error::Category::Data;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Importance {
@@ -16,15 +17,18 @@ pub struct Task<'a> {
     id: u32,
     #[serde(borrow)]
     description: &'a str,
+    #[serde(borrow)]
+    project: Option<&'a str>,
     importance: Option<Importance>,
     time_stamp: u128
 }
 
 impl Task<'_> {
-    pub fn new(id: u32, description: &str, importance: Option<Importance>) -> Task {
+    pub fn new<'a>(id: u32, description: &'a str, project: Option<&'a str>, importance: Option<Importance>) -> Task<'a> {
         Task {
             id,
             description,
+            project,
             importance,
             time_stamp: std::time::Instant::now().elapsed().as_millis(),
         }
@@ -48,7 +52,7 @@ impl<'a> DataPersisted<'a> {
         }
     }
 
-    pub fn add_active<'b: 'a>(&mut self, description: &'b str, importance: Option<Importance>) -> () {
+    pub fn add_active<'b: 'a>(&mut self, description: &'b str, project: Option<&'b str>, importance: Option<Importance>) -> () {
         let mut next_id = 1;
         for i in 1..u32::MAX {
             if self.active.iter().any(|task| task.id == i) {
@@ -60,7 +64,7 @@ impl<'a> DataPersisted<'a> {
                 break;
             }
         }
-        self.active.append(&mut vec![Task::new(next_id as u32, description, importance)])
+        self.active.append(&mut vec![Task::new(next_id as u32, description, project, importance)])
     }
 
     pub fn mark_completed(&mut self, task_id: u32) -> () {
@@ -107,19 +111,28 @@ impl<'a> DataPersisted<'a> {
     pub fn print_tty(&self) -> String {
         let mut res = String::new();
         res.push_str("\u{001b}[1;31mActive\u{001b}[0m \u{23F3}\n");
-        let greatest_size = self.active.iter().map(|task|task.description.len()).max();
+        let greatest_size = self.active.iter().map(|task|task.id.to_string().len()).max();
         for i in &self.active {
-            res.push_str(format!("{:width$}{}{}", i.description, i.id, "\n", width = greatest_size.unwrap() + 3).as_str());
+            res.push_str(DataPersisted::print_task(i, greatest_size.unwrap()).as_str());
         }
         res.push_str("\n");
         res.push_str("\n");
 
         res.push_str("\u{001b}[1;31mCompleted\u{001b}[0m \u{2705}\n");
-        let greatest_size = self.completed.iter().map(|task|task.description.len()).max();
+        let greatest_size = self.completed.iter().map(|task|task.id.to_string().len()).max();
         for i in &self.completed {
-            res.push_str(format!("{:width$}{}{}", i.description, i.id, "\n", width = greatest_size.unwrap() + 3).as_str());
+            res.push_str(DataPersisted::print_task(i, greatest_size.unwrap()).as_str());
         }
 
         res
     }
+
+    fn print_task<'b>(task: &'b Task<'b>, max_id: usize) -> String {
+        format!("{:width$} {} {}\n", task.id, task.description, DataPersisted::format_project(task.project.unwrap_or_else(||"")), width = max_id)
+    }
+
+    fn format_project(project_name: &str) -> String {
+        format!("\u{001b}[40;1m\u{001b}[33m{}\u{001b}[0m", project_name)
+    }
+
 }

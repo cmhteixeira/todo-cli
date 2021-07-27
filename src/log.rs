@@ -4,12 +4,14 @@ use std::num::ParseIntError;
 
 pub struct AddTask<'a> {
     pub task_name: &'a str,
+    pub project: Option<&'a str>,
 }
 
-impl<'a> AddTask<'a> {
-    fn new(name: &'a str) -> AddTask {
+impl AddTask<'_> {
+    fn new<'a>(name: &'a str, project: Option<&'a str>) -> AddTask<'a> {
         AddTask {
-            task_name: name
+            task_name: name,
+            project,
         }
     }
 }
@@ -70,6 +72,8 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
 
     let list = i.is_present("list");
 
+    let project = i.value_of("project");
+
     let delete: Option<Result<Vec<u8>, String>> =
         i.values_of("delete")
             .map(|values|
@@ -87,7 +91,7 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
         (None, None, Some(Ok(tasks_to_delete)), _) =>
             Ok(Action::Delete(DeleteTasks::new_many(tasks_to_delete))),
         (None, None, Some(Err(error)), _) => Err(error),
-        (Some(a), None, None, _) => Ok(Action::Add(AddTask::new(a))),
+        (Some(a), None, None, _) => Ok(Action::Add(AddTask::new(a, project))),
         (_, _, _, _) => Err(String::from("Not supported yet!")),
     }
 }
