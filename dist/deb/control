@@ -1,0 +1,10 @@
+Package: todo-cli
+Version: 0.1.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: Carlos Teixeira <c.mh.teixeira@gmail.com>
+Description: Very simple CLI to help you manage your list of todos.
+ Increase your productivity by managing your list of tasks directly
+ on the command line.
+
