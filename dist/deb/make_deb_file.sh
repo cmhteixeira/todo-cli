@@ -21,6 +21,9 @@ mkdir $root_debian/usr/local/bin
 # Copy the versioned control file
 cp $dir_of_script/control $root_debian/DEBIAN
 
+# Make the binary smaller (Copied from here https://stackoverflow.com/questions/29008127/why-are-rust-executables-so-huge)
+strip $root_project_path/target/release/todo-cli
+
 # Copy over the binary
 cp $root_project_path/target/release/todo-cli $root_debian/usr/local/bin
 

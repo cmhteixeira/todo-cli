@@ -10,3 +10,9 @@ edition = "2018"
 clap = "2.33.3"
 serde_json = "1.0.64"
 serde = {version = "1.0.100", features = ["derive"]}
+
+[profile.release]   # Copied from here https://stackoverflow.com/questions/29008127/why-are-rust-executables-so-huge
+opt-level = 'z'     # Optimize for size.
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Reduce number of codegen units to increase optimizations.
+panic = 'abort'     # Abort on panic
