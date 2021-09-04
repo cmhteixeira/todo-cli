@@ -1,8 +1,8 @@
-name: Flow for the master branch
+name: Flow for tags
 on:
-  push:
-    branches:
-      - master
+  create:
+    tags:
+      - v*
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest

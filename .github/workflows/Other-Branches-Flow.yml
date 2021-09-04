@@ -1,8 +1,10 @@
-name: Flow for other branches
+name: Flow Push Branches
 on:
   push:
-    branches-ignore:
-      - master
+    tags-ignore:
+      - '**'
+    branches:
+      - "**"
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
