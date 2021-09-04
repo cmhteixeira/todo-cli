@@ -8,7 +8,7 @@ root_project_path="$(dirname "$(realpath $parent_dir)")"
 echo $root_project_path
 
 # dpkg-deb creates the .deb file with the name of the root folder
-deb_file_name="todo-cli_0.1.0_amd64"
+deb_file_name="todo-cli_0.2.0_amd64"
 
 mkdir "$root_project_path"/target/release/$deb_file_name
 root_debian="$root_project_path/target/release/$deb_file_name"

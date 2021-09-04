@@ -14,7 +14,7 @@ mod io;
 
 fn main() -> Result<(), String> {
     let matches = App::new("dev-todo")
-        .version("0.1.0")
+        .version("0.2.0")
         .author("Carlos Teixeira <c.mh.teixeira@gmail.com>")
         .about("Manage your tasks")
         .arg(Arg::with_name("add")
