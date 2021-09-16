@@ -1,0 +1,9 @@
+Package: {{ packageName }}
+Version: {{ packageVersion }}
+Section: utils
+Priority: optional
+Architecture: amd64
+Maintainer: {{ mantainerName }} <{{ mantainerEmail }}>
+Description: {{ simpleDescription }}
+ {{ longerDescription }}
+
