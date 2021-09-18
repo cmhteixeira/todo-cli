@@ -20,7 +20,7 @@ mkdir $root_debian/usr/local
 mkdir $root_debian/usr/local/bin
 
 # Generate the control file via templating
-node $root_project_path/dist/templating/index.js
+node $root_project_path/dist/templating/generateDebianControl.js
 
 # Copy the generated control file
 cp $dir_of_script/control $root_debian/DEBIAN

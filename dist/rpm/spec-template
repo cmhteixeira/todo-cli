@@ -1,0 +1,22 @@
+Summary: {{ simpleDescription }}
+Name: {{ packageName }}
+Version: {{ packageVersion }}
+Release: 1
+BuildArch: x86_64
+License: GPL
+URL: {{ gitRepoUrl }}
+Packager: {{ mantainerName }} <{{ mantainerEmail }}>
+Source0: %{name}-%{version}.tar.gz
+
+%description
+{{ longerDescription }}
+
+%prep
+%setup -q
+
+%install
+mkdir -p %{buildroot}/%{_bindir}
+install -m 0755 %{name} %{buildroot}/%{_bindir}/%{name}
+
+%files
+%{_bindir}/%{name}

@@ -2,5 +2,6 @@
   "mantainerName": "Carlos Teixeira",
   "mantainerEmail": "c.mh.teixeira@gmail.com",
   "simpleDescription": "Very simple CLI to help you manage your list of todos.",
-  "longerDescription": "Increase your productivity by managing your list of tasks directly on the command line."
+  "longerDescription": "Increase your productivity by managing your list of tasks directly on the command line.",
+  "gitRepoUrl": "https://github.com/cmhteixeira/todo-cli"
 }
