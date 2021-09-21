@@ -1,6 +1,7 @@
 var { Liquid } = require('liquidjs');
 const path = require("path")
 const fs = require('fs');
+const fsP = require('fs').promises;
 const { getProjectName, getProjectVersion } = require('./obtainPackageInfo');
 
 
@@ -12,10 +13,11 @@ let properties = { ...propertiesFromJson, packageName: getProjectName(cargoFile)
 var engine = new Liquid();
 
 let generateDebControl = (destFolder) => {
+    let destGeneratedControl = path.join(destFolder, "control");
     return engine
         .renderFile(path.join(distDir, "deb/control_template"), properties)
         .then((res) => {
-            return fs.writeFileSync(path.join(distDir, "deb/control"), res);
+            return fsP.writeFile(destGeneratedControl, res);
         });
 }
 

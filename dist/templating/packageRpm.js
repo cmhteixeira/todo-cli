@@ -35,7 +35,6 @@ let createExpectedStructure =
 
 
 // Generate spec and file based on the template
-// generateDebControl();
 let specDestP = createExpectedStructure
     .then(() => {
         return generateRpmSpec(path.join(releaseDir, "rpmbuild/SPECS"));

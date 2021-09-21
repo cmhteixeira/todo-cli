@@ -18,11 +18,15 @@ jobs:
         with:
          command: build
          args: --release --all-features
+      - name: Set up NodeJS   
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'         
       - name: Install nodejs dependencies
         working-directory: dist/templating
         run: |
           npm install
       - name: Create .deb package
+        working-directory: dist/templating
         run: |
-          chmod +x ./dist/deb/make_deb_file.sh
-          ./dist/deb/make_deb_file.sh         
+          node packageDeb.js
