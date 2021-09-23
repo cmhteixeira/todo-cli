@@ -8,6 +8,9 @@ const { exec } = require("child_process");
 
 let projectRoot = path.join(__dirname, "../../");
 let releaseDir = path.join(projectRoot, "target/release");
+let rpmRoot = path.join(releaseDir, "rpmbuild");
+let specsFolder = path.join(rpmRoot, "SPECS");
+let sourcesFolder = path.join(rpmRoot, "SOURCES");
 
 // Test target/release folder exists (i.e. if cargo has built the binary)
 let alreadyBuilt = fs.existsSync(releaseDir);
@@ -18,26 +21,26 @@ if (!alreadyBuilt) {
 }
 
 
-let deleteStructureIfExists = fsP.rm(path.join(releaseDir, "rpmbuild"), { force: true, recursive: true })
+let deleteStructureIfExists = fsP.rm(rpmRoot, { force: true, recursive: true });
 
 
 let createExpectedStructure =
     deleteStructureIfExists
         .then(() => {
-            return fsP.mkdir(path.join(releaseDir, "rpmbuild"), { recursive: true })
+            return fsP.mkdir(rpmRoot, { recursive: true });
         })
         .then(() => {
-            return fsP.mkdir(path.join(releaseDir, "rpmbuild/SOURCES"), { recursive: true });
+            return fsP.mkdir(sourcesFolder, { recursive: true });
         })
         .then(() => {
-            return fsP.mkdir(path.join(releaseDir, "rpmbuild/SPECS"), { recursive: true })
+            return fsP.mkdir(specsFolder, { recursive: true });
         });
 
 
 // Generate spec and file based on the template
 let specDestP = createExpectedStructure
     .then(() => {
-        return generateRpmSpec(path.join(releaseDir, "rpmbuild/SPECS"));
+        return generateRpmSpec(specsFolder);
     });
 
 
@@ -45,24 +48,30 @@ let specDestP = createExpectedStructure
 let done = specDestP
     .then(() => {
         new Promise((resolve, reject) => {
-            fs.copyFile(path.join(releaseDir, properties.binaryName), path.join(releaseDir, `rpmbuild/SOURCES/${properties.binaryName}`), (err) => {
-                if (err) reject(err);
-                else resolve();
-            })
+            fs.copyFile(
+                path.join(releaseDir, properties.binaryName),
+                path.join(sourcesFolder, properties.binaryName),
+                (err) => {
+                    if (err) reject(err);
+                    else resolve();
+                })
         })
     })
     .then(() => {
-        return fsP.mkdir(path.join(releaseDir, `rpmbuild/SOURCES/${properties.packageName}-${properties.packageVersion}`));
+        return fsP.mkdir(path.join(sourcesFolder, `${properties.packageName}-${properties.packageVersion}`));
     })
     .then(() => {
-        return fsP.copyFile(path.join(releaseDir, `rpmbuild/SOURCES/${properties.binaryName}`), path.join(releaseDir, `rpmbuild/SOURCES/${properties.packageName}-${properties.packageVersion}/${properties.binaryName}`))
+        return fsP.copyFile(
+            path.join(sourcesFolder, properties.binaryName),
+            path.join(sourcesFolder, `${properties.packageName}-${properties.packageVersion}/${properties.binaryName}`)
+        )
     })
     .then(() => {
         return tar.c(
             {
-                cwd: path.join(releaseDir, "rpmbuild/SOURCES"),
+                cwd: sourcesFolder,
                 gzip: true,
-                file: path.join(releaseDir, `rpmbuild/SOURCES/${properties.packageName}-${properties.packageVersion}.tar.gz`)
+                file: path.join(sourcesFolder, `${properties.packageName}-${properties.packageVersion}.tar.gz`)
             },
             [`${properties.packageName}-${properties.packageVersion}`]
         )
@@ -73,7 +82,7 @@ let done = specDestP
 
 // Run rpmbuild to _build_ the .rpm package
 Promise.all([specDestP, done]).then(([specDest, as]) => {
-    let commandToCall = `rpmbuild --define '_topdir ${path.join(releaseDir, "rpmbuild")}' -bb ${specDest}`;
+    let commandToCall = `rpmbuild --define '_topdir ${rpmRoot}' -bb ${specDest}`;
     exec(commandToCall, (error, stdout, stderr) => {
         if (error) {
             console.log(`Error calling '${commandToCall}': ${error.message}`);
