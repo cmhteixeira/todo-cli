@@ -30,3 +30,7 @@ jobs:
         working-directory: dist/templating
         run: |
           node packageDeb.js
+      - name: Create .rpm package
+        working-directory: dist/templating
+        run: |
+          node packageRpm.js
