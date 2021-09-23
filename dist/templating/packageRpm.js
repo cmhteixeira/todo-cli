@@ -11,6 +11,7 @@ let releaseDir = path.join(projectRoot, "target/release");
 let rpmRoot = path.join(releaseDir, "rpmbuild");
 let specsFolder = path.join(rpmRoot, "SPECS");
 let sourcesFolder = path.join(rpmRoot, "SOURCES");
+let binaryFile = path.join(releaseDir, properties.binaryName);
 
 // Test target/release folder exists (i.e. if cargo has built the binary)
 let alreadyBuilt = fs.existsSync(releaseDir);
@@ -44,12 +45,19 @@ let specDestP = createExpectedStructure
     });
 
 
+// Make the binary smaller (Copied from here https://stackoverflow.com/questions/29008127/why-are-rust-executables-so-huge)
+let stripExecutable = specDestP.then(() => {
+    execSync(`strip ${binaryFile}`);
+})
+
+
+
 // Copy executable and tar-gz it to '%{topdir}/rpmbuild/SOURCES'
-let done = specDestP
+let done = stripExecutable
     .then(() => {
         new Promise((resolve, reject) => {
             fs.copyFile(
-                path.join(releaseDir, properties.binaryName),
+                binaryFile,
                 path.join(sourcesFolder, properties.binaryName),
                 (err) => {
                     if (err) reject(err);

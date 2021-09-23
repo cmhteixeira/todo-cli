@@ -66,5 +66,5 @@ let done = stripExecutable
 
 // Run rpmbuild to _build_ the .rpm package
 let final = done.then(() => {
-    return execSync(`dpkg-deb --build ${debRoot}`);
+    execSync(`dpkg-deb --build ${debRoot}`);
 });
