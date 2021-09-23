@@ -3,7 +3,7 @@ const fsP = require('fs').promises;
 const path = require('path');
 var tar = require('tar');
 const { properties, generateRpmSpec } = require('./templating');
-const { exec } = require("child_process");
+const { execSync } = require("child_process");
 
 
 let projectRoot = path.join(__dirname, "../../");
@@ -78,20 +78,7 @@ let done = specDestP
     });
 
 
-
-
 // Run rpmbuild to _build_ the .rpm package
 Promise.all([specDestP, done]).then(([specDest, as]) => {
-    let commandToCall = `rpmbuild --define '_topdir ${rpmRoot}' -bb ${specDest}`;
-    exec(commandToCall, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`Error calling '${commandToCall}': ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.log(`stderr for '${commandToCall}': ${stderr}`);
-            return;
-        }
-        console.log(`Logs for '${commandToCall}': ${stdout}`);
-    });
+    execSync(`rpmbuild --define '_topdir ${rpmRoot}' -bb ${specDest}`);
 })

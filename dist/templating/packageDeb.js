@@ -2,7 +2,7 @@ const { generateDebControl, properties } = require("./templating");
 const fs = require('fs');
 const fsP = require('fs').promises;
 const path = require('path');
-const { exec } = require("child_process");
+const { execSync } = require("child_process");
 
 
 let projectRoot = path.join(__dirname, "../../");
@@ -47,18 +47,7 @@ let controlDestP = createExpectedStructure
 
 // Make the binary smaller (Copied from here https://stackoverflow.com/questions/29008127/why-are-rust-executables-so-huge)
 let stripExecutable = controlDestP.then(() => {
-    let commandToCall = `strip ${binaryFile}`;
-    exec(commandToCall, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`Error calling '${commandToCall}': ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.log(`stderr for '${commandToCall}': ${stderr}`);
-            return;
-        }
-        console.log(`Logs for '${commandToCall}': ${stdout}`);
-    });
+    execSync(`strip ${binaryFile}`);
 })
 
 
@@ -76,17 +65,6 @@ let done = stripExecutable
     });
 
 // Run rpmbuild to _build_ the .rpm package
-done.then(() => {
-    let commandToCall = `dpkg-deb --build ${debRoot}`;
-    exec(commandToCall, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`Error calling '${commandToCall}': ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.log(`stderr for '${commandToCall}': ${stderr}`);
-            return;
-        }
-        console.log(`Logs for '${commandToCall}': ${stdout}`);
-    });
+let final = done.then(() => {
+    return execSync(`dpkg-deb --build ${debRoot}`);
 });
