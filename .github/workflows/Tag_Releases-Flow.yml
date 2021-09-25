@@ -27,11 +27,11 @@ jobs:
       - name: Reduce size of Linux (x64) binary (strip)
         working-directory: target/release
         run: |
-          strip todo-cli
+          strip todo
       - name: Reduce size of Windows (x64) binary (strip)
         working-directory: target/x86_64-pc-windows-gnu/release
         run: |
-          strip todo-cli.exe
+          strip todo.exe
       - name: Set up NodeJS
         uses: actions/setup-node@v2
         with:
@@ -55,5 +55,5 @@ jobs:
           files: |
             ./target/release/*.deb
             ./target/release/**/*.rpm
-            ./target/release/todo-cli
-            ./target/x86_64-pc-windows-gnu/release/todo-cli.exe
+            ./target/release/todo
+            ./target/x86_64-pc-windows-gnu/release/todo.exe

@@ -2,13 +2,18 @@ var { Liquid } = require('liquidjs');
 const path = require("path")
 const fs = require('fs');
 const fsP = require('fs').promises;
-const { getProjectName, getProjectVersion } = require('./obtainPackageInfo');
+const { getProjectName, getProjectVersion, getBinaryName } = require('./obtainPackageInfo');
 
 
 let distDir = path.join(__dirname, "../");
 let propertiesFromJson = JSON.parse(fs.readFileSync(path.join(distDir, "properties.json")));
 let cargoFile = path.join(__dirname, "../../Cargo.toml");;
-let properties = { ...propertiesFromJson, packageName: getProjectName(cargoFile), packageVersion: getProjectVersion(cargoFile), binaryName: getProjectName(cargoFile)};
+let properties = { 
+    ...propertiesFromJson,
+     packageName: getProjectName(cargoFile),
+    packageVersion: getProjectVersion(cargoFile), 
+    binaryName: getBinaryName(cargoFile)
+};
 
 var engine = new Liquid();
 

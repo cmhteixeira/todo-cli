@@ -16,7 +16,7 @@ Source0: %{name}-%{version}.tar.gz
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
-install -m 0755 %{name} %{buildroot}/%{_bindir}/%{name}
+install -m 0755 {{ binaryName }} %{buildroot}/%{_bindir}/{{ binaryName }}
 
 %files
-%{_bindir}/%{name}
+%{_bindir}/{{ binaryName }}

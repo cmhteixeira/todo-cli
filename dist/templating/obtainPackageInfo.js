@@ -17,8 +17,16 @@ function projectVersion(cargoToml) {
     return cargoToml.package.version;
 }
 
+function binaryName(cargoToml){
+    return cargoToml.bin[0].name;
+}
+
 function getProjectName(cargoFile) {
     return projectName(readToml(cargoFile));
+}
+
+function getBinaryName(cargoFile) {
+    return binaryName(readToml(cargoFile));
 }
 
 
@@ -28,3 +36,4 @@ function getProjectVersion(cargoFile) {
 
 exports.getProjectName = getProjectName;
 exports.getProjectVersion = getProjectVersion;
+exports.getBinaryName = getBinaryName;
