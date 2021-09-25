@@ -1,6 +1,6 @@
 Summary: {{ simpleDescription }}
 Name: {{ packageName }}
-Version: {{ packageVersion }}
+Version: {{ rpmVersion }}
 Release: 1
 BuildArch: x86_64
 License: GPL

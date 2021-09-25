@@ -5,14 +5,15 @@
   "main": "index.js",
   "dependencies": {
     "@types/node": "^16.9.4",
+    "@types/semver": "^7.3.8",
     "@types/tar": "^4.0.5",
     "fs": "^0.0.1-security",
     "liquidjs": "^9.25.1",
     "path": "^0.12.7",
+    "semver": "^7.3.5",
     "tar": "^6.1.11",
     "toml": "^3.0.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\""
   },

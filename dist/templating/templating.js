@@ -3,15 +3,27 @@ const path = require("path")
 const fs = require('fs');
 const fsP = require('fs').promises;
 const { getProjectName, getProjectVersion, getBinaryName } = require('./obtainPackageInfo');
+const semver = require('semver');
 
 
 let distDir = path.join(__dirname, "../");
 let propertiesFromJson = JSON.parse(fs.readFileSync(path.join(distDir, "properties.json")));
 let cargoFile = path.join(__dirname, "../../Cargo.toml");;
-let properties = { 
+
+
+function mainVersion(projectVersion) {
+    let fullV = semver.parse(projectVersion);
+    let mainVersion = `${fullV.major}.${fullV.minor}.${fullV.patch}`;
+    return mainVersion;
+}
+
+
+let properties = {
     ...propertiesFromJson,
-     packageName: getProjectName(cargoFile),
-    packageVersion: getProjectVersion(cargoFile), 
+    packageName: getProjectName(cargoFile),
+    packageVersion: getProjectVersion(cargoFile),
+    debVersion: mainVersion(getProjectVersion(cargoFile)),
+    rpmVersion: mainVersion(getProjectVersion(cargoFile)),
     binaryName: getBinaryName(cargoFile)
 };
 

@@ -11,6 +11,7 @@ let releaseDir = path.join(projectRoot, "target/release");
 let rpmRoot = path.join(releaseDir, "rpmbuild");
 let specsFolder = path.join(rpmRoot, "SPECS");
 let sourcesFolder = path.join(rpmRoot, "SOURCES");
+let binaryHolderFolder = path.join(sourcesFolder, `${properties.packageName}-${properties.rpmVersion}`);
 let binaryFile = path.join(releaseDir, properties.binaryName);
 
 // Test target/release folder exists (i.e. if cargo has built the binary)
@@ -66,12 +67,12 @@ let done = stripExecutable
         })
     })
     .then(() => {
-        return fsP.mkdir(path.join(sourcesFolder, `${properties.packageName}-${properties.packageVersion}`));
+        return fsP.mkdir(binaryHolderFolder);
     })
     .then(() => {
         return fsP.copyFile(
             path.join(sourcesFolder, properties.binaryName),
-            path.join(sourcesFolder, `${properties.packageName}-${properties.packageVersion}/${properties.binaryName}`)
+            path.join(binaryHolderFolder, properties.binaryName)
         )
     })
     .then(() => {
@@ -79,9 +80,9 @@ let done = stripExecutable
             {
                 cwd: sourcesFolder,
                 gzip: true,
-                file: path.join(sourcesFolder, `${properties.packageName}-${properties.packageVersion}.tar.gz`)
+                file: path.join(sourcesFolder, `${properties.packageName}-${properties.rpmVersion}.tar.gz`)
             },
-            [`${properties.packageName}-${properties.packageVersion}`]
+            [`${properties.packageName}-${properties.rpmVersion}`]
         )
     });
 
