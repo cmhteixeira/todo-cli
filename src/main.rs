@@ -2,7 +2,7 @@ use std::fs;
 use std::io::prelude::Write;
 use std::path::Path;
 use todo_cli::log;
-use clap::{App, Arg, SubCommand, Values};
+use clap::{App, Arg, SubCommand, Values, AppSettings};
 use todo_cli::log::{process_arguments, Action};
 use todo_cli::data;
 use std::io::Read;
@@ -47,6 +47,7 @@ fn main() -> Result<(), String> {
             .multiple(true)
             .use_delimiter(true)
         )
+        .setting(AppSettings::ArgRequiredElseHelp)
         .get_matches();
 
     let persisted = io::read_user_state()?;
