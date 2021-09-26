@@ -28,6 +28,12 @@ fn main() -> Result<(), String> {
             .help("Specify a project this task should be added too.")
             .takes_value(true)
             .requires("add"))
+        .arg(Arg::with_name("context")
+            .short("k")
+            .long("kontext")
+            .help("Specify the context for this task.")
+            .takes_value(true)
+            .requires("add"))
         .arg(Arg::with_name("list")
             .short("l")
             .long("list")
@@ -63,7 +69,7 @@ fn main() -> Result<(), String> {
     let mut what_to_print = String::new();
     match action {
         Action::Add(r) =>
-            bar.add_active(r.task_name, r.project, None),
+            bar.add_active(r.task_name, r.project, r.context, None),
         Action::Complete(task) => bar.complete_tasks(task.task_ids),
         Action::List => what_to_print.push_str(bar.print_tty().as_str()),
         Action::Delete(log::DeleteTasks {task_ids}) => bar.delete_tasks(task_ids),

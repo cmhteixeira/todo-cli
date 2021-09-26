@@ -5,13 +5,15 @@ use std::num::ParseIntError;
 pub struct AddTask<'a> {
     pub task_name: &'a str,
     pub project: Option<&'a str>,
+    pub context: Option<&'a str>
 }
 
 impl AddTask<'_> {
-    fn new<'a>(name: &'a str, project: Option<&'a str>) -> AddTask<'a> {
+    fn new<'a>(name: &'a str, project: Option<&'a str>, context: Option<&'a str>) -> AddTask<'a> {
         AddTask {
             task_name: name,
             project,
+            context
         }
     }
 }
@@ -74,6 +76,8 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
 
     let project = i.value_of("project");
 
+    let context = i.value_of("context");
+
     let delete: Option<Result<Vec<u8>, String>> =
         i.values_of("delete")
             .map(|values|
@@ -91,7 +95,7 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
         (None, None, Some(Ok(tasks_to_delete)), _) =>
             Ok(Action::Delete(DeleteTasks::new_many(tasks_to_delete))),
         (None, None, Some(Err(error)), _) => Err(error),
-        (Some(a), None, None, _) => Ok(Action::Add(AddTask::new(a, project))),
+        (Some(a), None, None, _) => Ok(Action::Add(AddTask::new(a, project, context))),
         (_, _, _, _) => Err(String::from("Not supported yet!")),
     }
 }

@@ -9,7 +9,7 @@ pub enum Importance {
     Two,
     Three,
     Four,
-    Five
+    Five,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -19,16 +19,19 @@ pub struct Task<'a> {
     description: &'a str,
     #[serde(borrow)]
     project: Option<&'a str>,
+    #[serde(borrow)]
+    context: Option<&'a str>,
     importance: Option<Importance>,
-    time_stamp: u128
+    time_stamp: u128,
 }
 
 impl Task<'_> {
-    pub fn new<'a>(id: u32, description: &'a str, project: Option<&'a str>, importance: Option<Importance>) -> Task<'a> {
+    pub fn new<'a>(id: u32, description: &'a str, project: Option<&'a str>, context: Option<&'a str>, importance: Option<Importance>) -> Task<'a> {
         Task {
             id,
             description,
             project,
+            context,
             importance,
             time_stamp: std::time::Instant::now().elapsed().as_millis(),
         }
@@ -52,7 +55,7 @@ impl<'a> DataPersisted<'a> {
         }
     }
 
-    pub fn add_active<'b: 'a>(&mut self, description: &'b str, project: Option<&'b str>, importance: Option<Importance>) -> () {
+    pub fn add_active<'b: 'a>(&mut self, description: &'b str, project: Option<&'b str>, context: Option<&'b str>, importance: Option<Importance>) -> () {
         let mut next_id = 1;
         for i in 1..u32::MAX {
             if self.active.iter().any(|task| task.id == i) {
@@ -64,7 +67,7 @@ impl<'a> DataPersisted<'a> {
                 break;
             }
         }
-        self.active.append(&mut vec![Task::new(next_id as u32, description, project, importance)])
+        self.active.append(&mut vec![Task::new(next_id as u32, description, project, context, importance)])
     }
 
     pub fn mark_completed(&mut self, task_id: u32) -> () {
@@ -111,7 +114,7 @@ impl<'a> DataPersisted<'a> {
     pub fn print_tty(&self) -> String {
         let mut res = String::new();
         res.push_str("\u{001b}[1;31mActive\u{001b}[0m \u{23F3}\n");
-        let greatest_size = self.active.iter().map(|task|task.id.to_string().len()).max();
+        let greatest_size = self.active.iter().map(|task| task.id.to_string().len()).max();
         for i in &self.active {
             res.push_str(DataPersisted::print_task(i, greatest_size.unwrap()).as_str());
         }
@@ -119,7 +122,7 @@ impl<'a> DataPersisted<'a> {
         res.push_str("\n");
 
         res.push_str("\u{001b}[1;31mCompleted\u{001b}[0m \u{2705}\n");
-        let greatest_size = self.completed.iter().map(|task|task.id.to_string().len()).max();
+        let greatest_size = self.completed.iter().map(|task| task.id.to_string().len()).max();
         for i in &self.completed {
             res.push_str(DataPersisted::print_task(i, greatest_size.unwrap()).as_str());
         }
@@ -128,11 +131,14 @@ impl<'a> DataPersisted<'a> {
     }
 
     fn print_task<'b>(task: &'b Task<'b>, max_id: usize) -> String {
-        format!("{:width$} {} {}\n", task.id, task.description, DataPersisted::format_project(task.project.unwrap_or_else(||"")), width = max_id)
+        format!("{:width$} {} {} {}\n", task.id, task.description, DataPersisted::format_project(task.project.unwrap_or_else(|| "")), DataPersisted::format_context(task.context.unwrap_or_else(|| "")), width = max_id)
     }
 
     fn format_project(project_name: &str) -> String {
         format!("\u{001b}[40;1m\u{001b}[33m{}\u{001b}[0m", project_name)
     }
 
+    fn format_context(context_name: &str) -> String {
+        format!("\u{001b}[40;1m\u{001b}[33m{}\u{001b}[0m", context_name)
+    }
 }
