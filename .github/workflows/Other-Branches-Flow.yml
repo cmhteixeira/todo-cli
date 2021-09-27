@@ -16,18 +16,21 @@ jobs:
           target: x86_64-pc-windows-gnu
       - name: Install 'mingw-w64' to be able to compile for windows
         run: sudo apt-get install mingw-w64
+      - name: Installing 'musl' target
+        run: |
+          rustup target add x86_64-unknown-linux-musl
       - name: Build Linux (x64) Binary
         uses: actions-rs/cargo@v1
         with:
          command: build
-         args: --release --all-features
+         args: --release --all-features --target x86_64-unknown-linux-musl
       - name: Build Windows (x64) Binary
         uses: actions-rs/cargo@v1
         with:
          command: build
          args: --release --target x86_64-pc-windows-gnu --all-features
       - name: Reduce size of Linux (x64) binary (strip)
-        working-directory: target/release
+        working-directory: target/x86_64-unknown-linux-musl/release
         run: |
           strip todo
       - name: Reduce size of Windows (x64) binary (strip)

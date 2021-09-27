@@ -7,14 +7,14 @@ const { execSync } = require("child_process");
 
 
 let projectRoot = path.join(__dirname, "../../");
-let releaseDir = path.join(projectRoot, "target/release");
+let releaseDir = path.join(projectRoot, "target/x86_64-unknown-linux-musl/release");
 let rpmRoot = path.join(releaseDir, "rpmbuild");
 let specsFolder = path.join(rpmRoot, "SPECS");
 let sourcesFolder = path.join(rpmRoot, "SOURCES");
 let binaryHolderFolder = path.join(sourcesFolder, `${properties.packageName}-${properties.rpmVersion}`);
 let binaryFile = path.join(releaseDir, properties.binaryName);
 
-// Test target/release folder exists (i.e. if cargo has built the binary)
+// Test target/x86_64-unknown-linux-musl/release folder exists (i.e. if cargo has built the binary)
 let alreadyBuilt = fs.existsSync(releaseDir);
 
 if (!alreadyBuilt) {
