@@ -1,6 +1,6 @@
 [package]
 name = "todo-cli"
-version = "0.5.0-SNAPSHOT"
+version = "0.5.0"
 authors = ["Carlos Teixeira <c.mh.teixeira@gmail.com>"]
 edition = "2018"
 
