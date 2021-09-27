@@ -6,7 +6,7 @@ const { execSync } = require("child_process");
 
 
 let projectRoot = path.join(__dirname, "../../");
-let releaseDir = path.join(projectRoot, "target/release");
+let releaseDir = path.join(projectRoot, "target/x86_64-unknown-linux-musl/release");
 let debFileName = `${properties.packageName}_${properties.debVersion}_amd64`; // dpkg-deb creates a .deb file with the same name as the folder "it operates on"
 let debRoot = path.join(releaseDir, debFileName);
 let debianFolder = path.join(debRoot, "DEBIAN");
@@ -14,7 +14,7 @@ let binaryDebFolder = path.join(debRoot, "usr/local/bin");
 let binaryFile = path.join(releaseDir, properties.binaryName);
 
 
-// Test target/release folder exists (i.e. if cargo has built the binary)
+// Test target/x86_64-unknown-linux-musl/release folder exists (i.e. if cargo has built the binary)
 let alreadyBuilt = fs.existsSync(releaseDir);
 
 if (!alreadyBuilt) {
