@@ -1,5 +1,5 @@
 use clap::ArgMatches;
-use crate::log::Action::Complete;
+use crate::log::Action::{Complete, BashCompletion};
 use std::num::ParseIntError;
 
 pub struct AddTask<'a> {
@@ -60,6 +60,7 @@ pub enum Action<'k> {
     Complete(CompleteTask),
     List,
     Delete(DeleteTasks),
+    BashCompletion(&'k str)
 }
 
 pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String> {
@@ -78,6 +79,8 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
 
     let context = i.value_of("context");
 
+    let tab_completion = i.value_of("tab_completion");
+
     let delete: Option<Result<Vec<u8>, String>> =
         i.values_of("delete")
             .map(|values|
@@ -88,15 +91,16 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
             );
 
 
-    match (add, complete, delete, list) {
-        (None, None, None, true) => Ok(Action::List),
-        (None, Some(Err(error)), None, _) => Err(error),
-        (None, Some(Ok(tasks_to_complete)), None, _) => Ok(Action::Complete(CompleteTask::new_many(tasks_to_complete))),
-        (None, None, Some(Ok(tasks_to_delete)), _) =>
+    match (tab_completion, add, complete, delete, list) {
+        (None, None, None, None, true) => Ok(Action::List),
+        (None, None, Some(Err(error)), None, _) => Err(error),
+        (None, None, Some(Ok(tasks_to_complete)), None, _) => Ok(Action::Complete(CompleteTask::new_many(tasks_to_complete))),
+        (None, None, None, Some(Ok(tasks_to_delete)), _) =>
             Ok(Action::Delete(DeleteTasks::new_many(tasks_to_delete))),
-        (None, None, Some(Err(error)), _) => Err(error),
-        (Some(a), None, None, _) => Ok(Action::Add(AddTask::new(a, project, context))),
-        (_, _, _, _) => Err(String::from("Not supported yet!")),
+        (None, None, None, Some(Err(error)), _) => Err(error),
+        (None, Some(a), None, None, _) => Ok(Action::Add(AddTask::new(a, project, context))),
+        (Some(arguments), _, _, _, _) => Ok(BashCompletion(arguments)),
+        (_, _, _, _, _) => Err(String::from("Not supported yet!")),
     }
 }
 

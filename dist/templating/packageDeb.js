@@ -11,6 +11,8 @@ let debFileName = `${properties.packageName}_${properties.debVersion}_amd64`; //
 let debRoot = path.join(releaseDir, debFileName);
 let debianFolder = path.join(debRoot, "DEBIAN");
 let binaryDebFolder = path.join(debRoot, "usr/local/bin");
+let bashCompletionSource = path.join(projectRoot, "dist/cli_completion/bash");
+let bashCompletionDestination = path.join(debRoot, `/usr/share/bash-completion/completions/${properties.binaryName}`);
 let binaryFile = path.join(releaseDir, properties.binaryName);
 
 
@@ -47,13 +49,13 @@ let controlDestP = createExpectedStructure
 
 // Make the binary smaller (Copied from here https://stackoverflow.com/questions/29008127/why-are-rust-executables-so-huge)
 let stripExecutable = controlDestP.then(() => {
-    execSync(`strip ${binaryFile}`);
+    return execSync(`strip ${binaryFile}`);
 })
 
 
 let done = stripExecutable
     .then(() => {
-        new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             fs.copyFile(
                 binaryFile,
                 path.join(binaryDebFolder, properties.binaryName),
@@ -62,7 +64,13 @@ let done = stripExecutable
                     else resolve();
                 })
         })
-    });
+    })
+    .then(() => {
+        return fsP.cp(
+            bashCompletionSource,
+            bashCompletionDestination
+        )
+    })
 
 // Run rpmbuild to _build_ the .rpm package
 let final = done.then(() => {

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+_todo ()
+{
+  FOO=$(todo --tab-completion \""${COMP_WORDS[@]}"\")
+  COMPREPLY+=$FOO
+#   COMPREPLY+=("tomorrow")
+#   COMPREPLY+=("never")
+} &&
+complete -F _todo todo
+
+
