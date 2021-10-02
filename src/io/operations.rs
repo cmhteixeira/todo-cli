@@ -1,8 +1,8 @@
 
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::io::{Read, Error, Write};
-use todo_cli::data::DataPersisted;
+use std::io::{Read, Write};
+
 
 
 
@@ -34,6 +34,6 @@ pub fn persist_user_state(payload: &str) -> Result<(), String> {
         .open(home_dir.as_path())
         .unwrap();
 
-    file.write(payload.as_bytes()).map(|size| ()).map_err(|error| error.to_string())
+    file.write(payload.as_bytes()).map(|_size| ()).map_err(|error| error.to_string())
 }
 

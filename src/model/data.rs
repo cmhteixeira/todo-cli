@@ -1,9 +1,8 @@
-use std::time::Instant;
-use serde::{Deserialize, Serialize};
-use serde_json::Result;
-use serde_json::error::Category::Data;
 
-#[derive(Serialize, Deserialize, Debug)]
+
+
+
+
 pub enum Importance {
     One,
     Two,
@@ -12,14 +11,10 @@ pub enum Importance {
     Five,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
 pub struct Task<'a> {
     id: u32,
-    #[serde(borrow)]
     description: &'a str,
-    #[serde(borrow)]
     project: Option<&'a str>,
-    #[serde(borrow)]
     context: Option<&'a str>,
     importance: Option<Importance>,
     time_stamp: u128,
@@ -38,12 +33,8 @@ impl Task<'_> {
     }
 }
 
-
-#[derive(Serialize, Deserialize, Debug)]
 pub struct DataPersisted<'b> {
-    #[serde(borrow)]
     active: Vec<Task<'b>>,
-    #[serde(borrow)]
     completed: Vec<Task<'b>>,
 }
 

@@ -1,5 +1,4 @@
 use clap::ArgMatches;
-use crate::log::Action::{Complete, BashCompletion};
 use std::num::ParseIntError;
 
 pub struct AddTask<'a> {
@@ -69,7 +68,7 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
         .map(|values|
             values.map(|del_id_maybe|
                 parse_id(del_id_maybe)
-                    .map_err(|error| format!("Error parsing value '{}'", del_id_maybe))
+                    .map_err(|_error| format!("Error parsing value '{}'", del_id_maybe))
             ).collect()
         );
 
@@ -86,7 +85,7 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
             .map(|values|
                 values.map(|del_id_maybe|
                     parse_id(del_id_maybe)
-                        .map_err(|error| format!("Error parsing value '{}'", del_id_maybe))
+                        .map_err(|_error| format!("Error parsing value '{}'", del_id_maybe))
                 ).collect()
             );
 
@@ -99,7 +98,7 @@ pub fn process_arguments<'y>(i: &'y ArgMatches<'y>) -> Result<Action<'y>, String
             Ok(Action::Delete(DeleteTasks::new_many(tasks_to_delete))),
         (None, None, None, Some(Err(error)), _) => Err(error),
         (None, Some(a), None, None, _) => Ok(Action::Add(AddTask::new(a, project, context))),
-        (Some(arguments), _, _, _, _) => Ok(BashCompletion(arguments)),
+        (Some(arguments), _, _, _, _) => Ok(Action::BashCompletion(arguments)),
         (_, _, _, _, _) => Err(String::from("Not supported yet!")),
     }
 }

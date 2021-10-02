@@ -1,4 +1,4 @@
-use clap::{App, Arg, SubCommand, Values, AppSettings};
+use clap::{App, Arg, AppSettings};
 
 pub fn foo() -> App<'static, 'static> {
 
